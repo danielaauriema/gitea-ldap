@@ -12,9 +12,9 @@ bash_test_header "gitea-ldap :: wait for connection"
 bash_wait_for_uri "http://localhost:3000" 60
 
 bash_test_header "gitea-ldap :: check admin login"
-curl -X 'GET' 'http://localhost:3000/api/v1/user' -H 'accept: application/json' -u 'gitea:password'
+curl -s -X 'GET' 'http://localhost:3000/api/v1/user' -H 'accept: application/json' -u 'gitea:password'
 
 bash_test_header "gitea-ldap :: check ldap login"
-curl -X 'GET' 'http://localhost:3000/api/v1/user' -H 'accept: application/json' -u 'ldap:password'
+curl -s -X 'GET' 'http://localhost:3000/api/v1/user' -H 'accept: application/json' -u 'ldap:password'
 
 bash_test_header "All tests has finished successfully!!"

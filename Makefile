@@ -1,5 +1,5 @@
 ifndef CMD
-	CMD=/opt/test/test.sh
+	CMD=chmod -R +x /opt/test && /opt/test/test.sh
 endif
 
 IMG_TAG=auriema/gitea:test
@@ -40,14 +40,15 @@ ci-test: up
 	$(DOCKER_PARAMS) \
 	$(IMG_TAG)
 
-	@docker exec -it gitea_test /bin/bash -c '$(CMD)'
+	@docker exec gitea_test /bin/bash -c '$(CMD)'
 
-	$(MAKE) down
+	@docker stop gitea_test
+	@$(DOCKER_DOWN)
 
 run: up
 	@docker run -it --rm \
 	-p "3000:3000" \
-	$(V_STARTUP) \
+	-v "$(V_STARTUP)" \
 	$(DOCKER_PARAMS) \
 	$(IMG_TAG)
 	@$(DOCKER_DOWN)
