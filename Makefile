@@ -40,7 +40,7 @@ ci-test: up
 	$(DOCKER_PARAMS) \
 	$(IMG_TAG)
 
-	@docker exec gitea_test /bin/bash -c '$(CMD_TEST)'
+	@docker exec gitea_test /bin/bash -c '$(CMD)'
 
 	@docker stop gitea_test
 	@$(DOCKER_DOWN)
