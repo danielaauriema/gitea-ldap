@@ -1,5 +1,5 @@
 ifndef CMD
-	CMD=/opt/test/test.sh
+	CMD=chmod -R +x /opt/test && /opt/test/test.sh
 endif
 
 IMG_TAG=auriema/gitea:test
