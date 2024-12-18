@@ -1,26 +1,64 @@
 services:
-  ldap-server:
-    image: ghcr.io/danielaauriema/docker-openldap:latest
-    container_name: ldap-server
+  openldap:
+    image: ghcr.io/danielaauriema/openldap:latest
+    container_name: openldap_test
+    ports:
+      - "389:389"
     environment:
-      LDAP_DOMAIN: "jenkins.local"
-      LDAP_BASE_DN: "dc=jenkins,dc=local"
+      LDAP_DOMAIN: "gitea.local"
+      LDAP_BASE_DN: "dc=gitea,dc=local"
       LDAP_BIND_USERNAME: "bind"
       LDAP_BIND_PASSWORD: "password"
-      LDAP_DEFAULT_USERNAME: "jenkins"
+      LDAP_DEFAULT_USERNAME: "ldap"
       LDAP_DEFAULT_PASSWORD: "password"
+    networks:
+      - gitea_test
 
-  jenkins-ldap:
-    build: .
-    container_name: jenkins-ldap
-    depends_on:
-      - ldap-server
-    ports:
-      - "8080:8080"
+  postgres:
+    image: postgres
+    container_name: postgres_test
     environment:
-      LDAP_SERVER: "ldap://ldap-server"
-      LDAP_BASE_DN: "dc=jenkins,dc=local"
-      LDAP_BIND_DN: "cn=bind,dc=jenkins,dc=local"
-      LDAP_BIND_PASSWORD: "password"
+      POSTGRES_PASSWORD: password
+    networks:
+      - gitea_test
 
-#  curl -k -u jenkins:password http://localhost:8080/metrics/currentUser/ping
+#  gitea:
+#    build: .
+#    container_name: gitea
+#    depends_on:
+#      - openldap
+#      - postgres
+#    ports:
+#      - "3000:3000"
+#    volumes:
+#      - "${PWD}/ldap:/app/ldap"
+#    environment:
+#      # database config/bitnami
+#      GITEA__database__DB_TYPE: "postgres"
+#      GITEA__database__HOST: "postgres"
+#      GITEA__database__NAME: "postgres"
+#      GITEA__database__USER: "postgres"
+#      GITEA__database__PASSWD: "password"
+#      # gitea config
+##      GITEA____RUN_MODE: "{{ gitea__run_mode }}"
+##      GITEA____APP_NAME: "{{ gitea__app_name }}"
+##      GITEA__log__LEVEL: "{{ gitea__log_level }}"
+#      GITEA__security__INSTALL_LOCK: "true"
+#      GITEA__service__DISABLE_REGISTRATION: "true"
+##      GITEA__server__SSH_PORT: "{{ gitea__ssh_port }}"
+##      GITEA__server__SSH_LISTEN_PORT: "22"
+##      GITEA__server__DOMAIN: "{{ gitea__domain }}"
+##      GITEA__server__ROOT_URL: "{{ gitea__root_url }}"
+##      GITEA__server__SSH_DOMAIN: "{{ gitea__domain }}"
+##      GITEA__repository__DEFAULT_BRANCH: "master"
+#
+#      LDAP__HOST: "openldap"
+#      LDAP__BASE_DN: "dc=gitea,dc=local"
+#      LDAP__BIND_DN: "cn=bind,dc=gitea,dc=local"
+#      LDAP__BIND_PASSWORD: "password"
+#      LDAP__SEARCH_BASE: "dc=gitea,dc=local"
+
+networks:
+  gitea_test:
+    name: gitea_test
+    driver: bridge

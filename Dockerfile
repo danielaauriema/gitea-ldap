@@ -1,22 +1,29 @@
-FROM jenkins/jenkins:2.479.1-lts-jdk21
+FROM gitea/gitea:1.22.2
 
-# Install Jenkins plugins
-COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
-RUN jenkins-plugin-cli --plugin-file /usr/share/jenkins/ref/plugins.txt
+RUN mkdir -p /opt/lib && \
+    curl -s https://raw.githubusercontent.com/danielaauriema/bash-tools/master/lib/bash-wait.sh > /opt/lib/bash-wait.sh
 
-# Disable the setup wizard as we will set up Jenkins as code
-ENV JAVA_OPTS="-Djenkins.install.runSetupWizard=false"
-
-# Copy the Configuration as Code (CasC) YAML file into the image
-COPY jenkins-ldap.yaml /var/jenkins_casc/jenkins-ldap.yaml
-
-# Tell the Jenkins Configuration as Code plugin where to find the YAML file
-ENV CASC_JENKINS_CONFIG="/var/jenkins_casc/jenkins-ldap.yaml"
+# Set Gitea admin user
+ENV GITEA__ADMIN_USERNAME="gitea"
+ENV GITEA__ADMIN_PASSWORD="password"
+ENV GITEA__ADMIN_EMAIL="gitea@gitea.local"
 
 # Set LDAP connection
-ENV LDAP_SERVER="ldap://ldap-server"
-ENV LDAP_BASE_DN="dc=jenkins,dc=local"
-ENV LDAP_BIND_DN="cn=bind,${LDAP__BASE_DN}"
-ENV LDAP_BIND_PASSWORD="password"
+ENV LDAP__PROTOCOL="unencrypted"
+ENV LDAP__HOST="openldap"
+ENV LDAP__PORT="389"
+ENV LDAP__BASE_DN="dc=gitea,dc=local"
+ENV LDAP__SEARCH_BASE="ou=users,${LDAP__BASE_DN}"
+ENV LDAP__BIND_DN="cn=bind,${LDAP__BASE_DN}"
+ENV LDAP__BIND_PASSWORD="password"
 
-ENV JENKINS_URL="http://localhost:8080"
+# Set Gitea variables
+ENV GITEA__security__INSTALL_LOCK="true"
+ENV GITEA__service__DISABLE_REGISTRATION="true"
+
+ADD startup /opt/startup
+RUN chmod -R +x /opt/startup
+WORKDIR /opt/startup
+
+ENTRYPOINT [ "/opt/startup/entrypoint" ]
+CMD []
