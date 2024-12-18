@@ -22,7 +22,7 @@ ENV GITEA__security__INSTALL_LOCK="true"
 ENV GITEA__service__DISABLE_REGISTRATION="true"
 
 ADD startup /opt/startup
-RUN chmod -R +x /opt/startup
+RUN chmod -R +rx /opt/startup
 WORKDIR /opt/startup
 
 ENTRYPOINT [ "/opt/startup/entrypoint" ]
