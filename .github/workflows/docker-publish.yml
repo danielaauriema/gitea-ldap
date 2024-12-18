@@ -37,12 +37,12 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Display info
-        run: echo $PWD && echo $pwd && echo $(basename ${GITHUB_REPOSITORY}) && echo ====== && env && echo ======
+        run: echo $PWD && echo $pwd && echo ${GITHUB_REPOSITORY} && echo ====== && env && echo ======
         shell: bash
 
       # Run Bash Tests
       - name: Run Tests
-        run: make build ldap-test
+        run: make build ci-test
         shell: bash
 
       # Install the cosign tool except on PR
